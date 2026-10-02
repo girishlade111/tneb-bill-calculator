@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TNEB Bill Calculator</title>
+    <style>
+        :root {
+            --primary-color: #1a73e8;
+            --primary-light: #e8f0fe;
+            --secondary-color: #34a853;
+            --text-dark: #202124;
+            --text-light: #70757a;
+            --bg-light: #ffffff;
+            --bg-dark: #202124;
+            --error-color: #ea4335;
+            --shadow: 0 4px 6px rgba(32, 33, 36, 0.1);
+            --border-radius: 8px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            color: var(--text-dark);
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body.dark-mode {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-right: 10px;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            margin: 0;
+            color: var(--primary-color);
+            font-size: 32px;
+        }
+
+        .dark-mode h1 {
+            color: #4dabf7;
+        }
+
+        .description {
+            color: var(--text-light);
+            margin-top: 5px;
+        }
+
+        .dark-mode .description {
+            color: #adb5bd;
+        }
+
+        .card {
+            background-color: var(--bg-light);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .dark-mode .card {
+            background-color: #2d2d2d;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 12px rgba(32, 33, 36, 0.15);
+        }
+
+        .dark-mode .card:hover {
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+
+        .dark-mode label {
+            color: #e0e0e0;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            color: var(--text-dark);
+            background-color: var(--bg-light);
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .dark-mode select, .dark-mode input {
+            background-color: #3d3d3d;
+            color: #e0e0e0;
+            border-color: #555;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.2);
+        }
+
+        .dark-mode select:focus, .dark-mode input:focus {
+            box-shadow: 0 0 0 3px rgba(77, 171, 247, 0.3);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 25px;
+        }
+
+        button {
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s, box-shadow 0.3s;
+        }
+
+        .calculate-btn {
+            background: linear-gradient(135deg, var(--primary-color), #4285f4);
+            color: white;
+            box-shadow: 0 2px 4px rgba(26, 115, 232, 0.3);
+        }
+
+        .dark-mode .calculate-btn {
+            background: linear-gradient(135deg, #1971d6, #378eff);
+        }
+
+        .reset-btn {
+            background-color: #f8f9fa;
+            color: var(--text-dark);
+            box-shadow: 0 2px 4px rgba(32, 33, 36, 0.1);
+        }
+
+        .dark-mode .reset-btn {
+            background-color: #3d3d3d;
+            color: #e0e0e0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        button:hover {
+            box-shadow: 0 4px 8px rgba(32, 33, 36, 0.2);
+        }
+
+        .dark-mode button:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        button:active {
+            transform: translateY(1px);
+            box-shadow: 0 1px 2px rgba(32, 33, 36, 0.2);
+        }
+
+        .result {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .total-amount {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+
+        .dark-mode .total-amount {
+            color: #4dabf7;
+        }
+
+        .bill-breakdown {
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        .dark-mode .bill-breakdown {
+            border-color: #555;
+        }
+
+        .bill-breakdown table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .bill-breakdown th, .bill-breakdown td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .dark-mode .bill-breakdown th, .dark-mode .bill-breakdown td {
+            border-color: #555;
+        }
+
+        .bill-breakdown th {
+            background-color: var(--primary-light);
+            font-weight: 500;
+        }
+
+        .dark-mode .bill-breakdown th {
+            background-color: #3d3d3d;
+        }
+
+        .bill-breakdown tr:last-child td {
+            border-bottom: none;
+        }
+
+        .bill-breakdown tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .dark-mode .bill-breakdown tr:nth-child(even) {
+            background-color: #333;
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .mode-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: var(--text-dark);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+        }
+
+        .dark-mode .mode-toggle {
+            color: #e0e0e0;
+        }
+
+        .mode-toggle:hover {
+            background-color: rgba(32, 33, 36, 0.1);
+        }
+
+        .dark-mode .mode-toggle:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+                margin: 15px auto;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+            }
+            
+            .mode-toggle {
+                top: 10px;
+                right: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="mode-toggle" id="modeToggle">☀️</button>
+    
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">⚡</div>
+                <h1>TNEB Bill Calculator</h1>
+            </div>
+            <p class="description">Calculate your electricity bill based on Tamil Nadu Electricity Board rates</p>
+        </header>
+        
+        <div class="card">
+            <div class="form-group">
+                <label for="category">User Category</label>
+                <select id="category">
+                    <option value="domestic">Domestic</option>
+                    <option value="commercial">Commercial</option>
+                    <option value="industrial">Industrial</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="units">Electricity Consumption (kWh/Units)</label>
+                <input type="number" id="units" placeholder="Enter units consumed">
+                <div class="error-message" id="unitsError">Please enter a valid number of units</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="phase">Connection Type</label>
+                <select id="phase">
+                    <option value="single">Single Phase</option>
+                    <option value="three">Three Phase</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="billing-cycle">Billing Cycle</label>
+                <select id="billing-cycle">
+                    <option value="bimonthly">Bi-monthly</option>
+                    <option value="monthly">Monthly</option>
+                </select>
+            </div>
+            
+            <div class="button-group">
+                <button class="calculate-btn" id="calculateBtn">Calculate Bill</button>
+                <button class="reset-btn" id="resetBtn">Reset</button>
+            </div>
+        </div>
+        
+        <div class="card result" id="resultCard">
+            <div class="total-amount">Total Bill: ₹<span id="totalAmount">0.00</span></div>
+            
+            <div class="bill-breakdown">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>Units</th>
+                            <th>Rate (₹)</th>
+                            <th>Amount (₹)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="breakdownBody">
+                        <!-- Breakdown rows will be dynamically added here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dark mode toggle functionality
+        const modeToggle = document.getElementById('modeToggle');
+        const body = document.body;
+        
+        function toggleDarkMode() {
+            body.classList.toggle('dark-mode');
+            if (body.classList.contains('dark-mode')) {
+                modeToggle.textContent = '🌙';
+            } else {
+                modeToggle.textContent = '☀️';
+            }
+        }
+        
+        modeToggle.addEventListener('click', toggleDarkMode);
+        
+        // Check user preference for dark mode
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            toggleDarkMode();
+        }
+        
+        // Bill calculation functionality
+        const calculateBtn = document.getElementById('calculateBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const resultCard = document.getElementById('resultCard');
+        const totalAmountSpan = document.getElementById('totalAmount');
+        const breakdownBody = document.getElementById('breakdownBody');
+        const unitsInput = document.getElementById('units');
+        const categorySelect = document.getElementById('category');
+        const phaseSelect = document.getElementById('phase');
+        const billingCycleSelect = document.getElementById('billing-cycle');
+        const unitsError = document.getElementById('unitsError');
+        
+        // TNEB Electricity rates (per unit in ₹)
+        const electricityRates = {
+            domestic: {
+                bimonthly: [
+                    { limit: 100, rate: 0 },          // 0-100 units (free)
+                    { limit: 200, rate: 1.5 },        // 101-200 units
+                    { limit: 500, rate: 2 },          // 201-500 units
+                    { limit: Infinity, rate: 6 }      // Above 500 units
+                ],
+                monthly: [
+                    { limit: 50, rate: 0 },           // 0-50 units (free)
+                    { limit: 100, rate: 1.5 },        // 51-100 units
+                    { limit: 250, rate: 2 },          // 101-250 units
+                    { limit: Infinity, rate: 6 }      // Above 250 units
+                ]
+            },
+            commercial: {
+                bimonthly: [
+                    { limit: 100, rate: 6 },          // 0-100 units
+                    { limit: 500, rate: 9 },          // 101-500 units
+                    { limit: Infinity, rate: 11 }     // Above 500 units
+                ],
+                monthly: [
+                    { limit: 50, rate: 6 },           // 0-50 units
+                    { limit: 250, rate: 9 },          // 51-250 units
+                    { limit: Infinity, rate: 11 }     // Above 250 units
+                ]
+            },
+            industrial: {
+                bimonthly: [
+                    { limit: 500, rate: 8 },          // 0-500 units
+                    { limit: Infinity, rate: 10 }     // Above 500 units
+                ],
+                monthly: [
+                    { limit: 250, rate: 8 },          // 0-250 units
+                    { limit: Infinity, rate: 10 }     // Above 250 units
+                ]
+            }
+        };
+        
+        // Fixed charges (₹)
+        const fixedCharges = {
+            domestic: {
+                single: { bimonthly: 50, monthly: 25 },
+                three: { bimonthly: 100, monthly: 50 }
+            },
+            commercial: {
+                single: { bimonthly: 150, monthly: 75 },
+                three: { bimonthly: 300, monthly: 150 }
+            },
+            industrial: {
+                single: { bimonthly: 200, monthly: 100 },
+                three: { bimonthly: 400, monthly: 200 }
+            }
+        };
+        
+        // Calculate button click event
+        calculateBtn.addEventListener('click', calculateBill);
+        
+        // Calculate the electricity bill
+        function calculateBill() {
+            // Get user inputs
+            const units = parseInt(unitsInput.value);
+            const category = categorySelect.value;
+            const phase = phaseSelect.value;
+            const billingCycle = billingCycleSelect.value;
+            
+            // Validate inputs
+            if (isNaN(units) || units < 0) {
+                unitsError.style.display = 'block';
+                resultCard.style.display = 'none';
+                return;
+            }
+            
+            unitsError.style.display = 'none';
+            
+            // Get the applicable rates for the selected category and billing cycle
+            const rates = electricityRates[category][billingCycle];
+            const fixedCharge = fixedCharges[category][phase][billingCycle];
+            
+            // Calculate energy charges
+            let totalEnergyCharge = 0;
+            let remainingUnits = units;
+            const breakdownRows = [];
+            
+            let prevLimit = 0;
+            
+            // Calculate charges for each slab
+            for (const slab of rates) {
+                const slabLimit = slab.limit;
+                const unitsInSlab = Math.min(remainingUnits, slabLimit - prevLimit);
+                
+                if (unitsInSlab <= 0) break;
+                
+                const slabCharge = unitsInSlab * slab.rate;
+                totalEnergyCharge += slabCharge;
+                
+                // Add breakdown row
+                const slabDescription = prevLimit === 0 ? 
+                    `First ${slabLimit} units` : 
+                    `${prevLimit + 1} to ${slabLimit === Infinity ? 'above' : slabLimit} units`;
+                
+                breakdownRows.push({
+                    description: slabDescription,
+                    units: unitsInSlab,
+                    rate: slab.rate,
+                    amount: slabCharge.toFixed(2)
+                });
+                
+                remainingUnits -= unitsInSlab;
+                prevLimit = slabLimit;
+                
+                if (remainingUnits <= 0) break;
+            }
+            
+            // Add fixed charge to breakdown
+            breakdownRows.push({
+                description: `Fixed Charges (${phase === 'single' ? 'Single Phase' : 'Three Phase'})`,
+                units: '-',
+                rate: '-',
+                amount: fixedCharge.toFixed(2)
+            });
+            
+            // Calculate total bill
+            const totalBill = totalEnergyCharge + fixedCharge;
+            
+            // Tax calculation (assuming 5% tax)
+            const taxAmount = totalBill * 0.05;
+            breakdownRows.push({
+                description: 'Tax (5%)',
+                units: '-',
+                rate: '-',
+                amount: taxAmount.toFixed(2)
+            });
+            
+            // Final total with tax
+            const finalTotal = totalBill + taxAmount;
+            
+            // Display the result
+            totalAmountSpan.textContent = finalTotal.toFixed(2);
+            
+            // Clear previous breakdown
+            breakdownBody.innerHTML = '';
+            
+            // Add breakdown rows
+            breakdownRows.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${row.description}</td>
+                    <td>${row.units}</td>
+                    <td>${row.rate}</td>
+                    <td>${row.amount}</td>
+                `;
+                breakdownBody.appendChild(tr);
+            });
+            
+            // Add final total row
+            const totalRow = document.createElement('tr');
+            totalRow.innerHTML = `
+                <td colspan="3"><strong>Total Bill Amount</strong></td>
+                <td><strong>₹${finalTotal.toFixed(2)}</strong></td>
+            `;
+            breakdownBody.appendChild(totalRow);
+            
+            // Show the result card
+            resultCard.style.display = 'block';
+        }
+        
+        // Reset button click event
+        resetBtn.addEventListener('click', () => {
+            unitsInput.value = '';
+            categorySelect.selectedIndex = 0;
+            phaseSelect.selectedIndex = 0;
+            billingCycleSelect.selectedIndex = 0;
+            resultCard.style.display = 'none';
+            unitsError.style.display = 'none';
+        });
+    </script>
+</body>
+</html>
